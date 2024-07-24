@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:13
+    container_name: postgres-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_DB=calender
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: node-express-app
+    ports:
+      - "8880:8880"
+    environment:
+      - NODE_ENV=production
+      - DB_USER=postgres
+      - DB_PASSWORD=12345678
+      - DB_HOST=database
+      - DB_PORT=5432
+      - DB_DATABASE=calender
+      - JWT_SECRET=W%9!BYQ$G-x)L*KH[SE}z6JPke&bgq~;48U+FAy
+      - JWT_EXPIRES=18000
+      - PORT=8880
+    depends_on:
+      database:
+        condition: service_healthy
+
+  frontend:
+    build: ./front-end
+    container_name: angular-app
+    ports:
+      - "80:80"
+
+volumes:
+  postgres_data:
