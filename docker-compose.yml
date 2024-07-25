@@ -41,7 +41,7 @@ services:
     build: ./front-end
     container_name: angular-app
     ports:
-      - "80:80"
+      - "4200:4200"
 
 volumes:
   postgres_data:
